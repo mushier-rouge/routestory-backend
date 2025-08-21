@@ -1,0 +1,46 @@
+{
+  "name": "routestory-backend-tests",
+  "version": "1.0.0",
+  "description": "Comprehensive test suite for RouteStory Backend",
+  "scripts": {
+    "test": "jest",
+    "test:unit": "jest tests/unit",
+    "test:integration": "jest tests/integration",
+    "test:e2e": "jest tests/e2e",
+    "test:performance": "jest tests/performance",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "test:verbose": "jest --verbose",
+    "test:all": "npm run test:unit && npm run test:integration && npm run test:e2e",
+    "test:runner": "node tests/run-tests.js",
+    "test:ci": "jest --coverage --ci --watchAll=false",
+    "test:report": "node tests/run-tests.js --coverage && open coverage/lcov-report/index.html"
+  },
+  "devDependencies": {
+    "@types/jest": "^29.5.12",
+    "jest": "^29.7.0",
+    "supertest": "^6.3.4",
+    "nock": "^13.5.4",
+    "dotenv": "^16.4.5"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.39.3",
+    "node-fetch": "^3.3.2"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "testMatch": [
+      "**/tests/**/*.test.js",
+      "**/tests/**/*.spec.js"
+    ],
+    "setupFilesAfterEnv": [
+      "<rootDir>/tests/setup.js"
+    ],
+    "collectCoverageFrom": [
+      "supabase/functions/**/*.ts",
+      "!supabase/functions/**/*.d.ts"
+    ],
+    "coverageDirectory": "coverage",
+    "coverageReporters": ["text", "lcov", "html"]
+  }
+}

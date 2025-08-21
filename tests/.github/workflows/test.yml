@@ -1,0 +1,134 @@
+name: RouteStory Backend Test Suite
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        node-version: [18.x, 20.x]
+        
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+        cache-dependency-path: tests/package-lock.json
+        
+    - name: Install dependencies
+      run: |
+        cd tests
+        npm ci
+        
+    - name: Run unit tests
+      run: |
+        cd tests
+        npm run test:unit
+      env:
+        NODE_ENV: test
+        
+    - name: Run integration tests
+      run: |
+        cd tests
+        npm run test:integration
+      env:
+        NODE_ENV: test
+        SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+        SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        GOOGLE_MAPS_API_KEY: ${{ secrets.GOOGLE_MAPS_API_KEY }}
+        GOOGLE_GEMINI_API_KEY: ${{ secrets.GOOGLE_GEMINI_API_KEY }}
+        
+    - name: Run end-to-end tests
+      run: |
+        cd tests
+        npm run test:e2e
+      env:
+        NODE_ENV: test
+        SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+        SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        GOOGLE_MAPS_API_KEY: ${{ secrets.GOOGLE_MAPS_API_KEY }}
+        GOOGLE_GEMINI_API_KEY: ${{ secrets.GOOGLE_GEMINI_API_KEY }}
+        
+    - name: Run performance tests
+      run: |
+        cd tests
+        npm run test:performance
+      env:
+        NODE_ENV: test
+        SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+        SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        GOOGLE_MAPS_API_KEY: ${{ secrets.GOOGLE_MAPS_API_KEY }}
+        
+    - name: Generate coverage report
+      run: |
+        cd tests
+        npm run test:coverage
+      env:
+        NODE_ENV: test
+        SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+        SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        GOOGLE_MAPS_API_KEY: ${{ secrets.GOOGLE_MAPS_API_KEY }}
+        GOOGLE_GEMINI_API_KEY: ${{ secrets.GOOGLE_GEMINI_API_KEY }}
+        
+    - name: Upload coverage reports to Codecov
+      uses: codecov/codecov-action@v3
+      with:
+        directory: tests/coverage
+        fail_ci_if_error: true
+        verbose: true
+        
+    - name: Archive test results
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: test-results-${{ matrix.node-version }}
+        path: |
+          tests/coverage/
+          tests/test-report.json
+          
+  performance-analysis:
+    runs-on: ubuntu-latest
+    needs: test
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20.x'
+        cache: 'npm'
+        cache-dependency-path: tests/package-lock.json
+        
+    - name: Install dependencies
+      run: |
+        cd tests
+        npm ci
+        
+    - name: Run comprehensive performance analysis
+      run: |
+        cd tests
+        node run-tests.js performance
+      env:
+        NODE_ENV: production
+        SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+        SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        GOOGLE_MAPS_API_KEY: ${{ secrets.GOOGLE_MAPS_API_KEY }}
+        
+    - name: Upload performance report
+      uses: actions/upload-artifact@v3
+      with:
+        name: performance-analysis
+        path: tests/test-report.json

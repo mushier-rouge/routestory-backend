@@ -36,3 +36,12 @@ Thumbs.db
 # Build outputs
 dist/
 build/
+
+# Google Cloud service account keys
+*.json
+!package*.json
+!deno.json
+!tsconfig.json
+
+# Supabase generated files
+supabase/functions/**/*.tar.gz
