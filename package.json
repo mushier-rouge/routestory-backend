@@ -1,0 +1,49 @@
+{
+  "name": "routestory-backend",
+  "version": "1.0.0",
+  "description": "RouteStory Backend - MVP system for generating scenic driving routes with location-triggered audio stories",
+  "main": "index.js",
+  "scripts": {
+    "dev": "supabase start",
+    "build": "supabase db push && supabase functions deploy",
+    "start": "supabase start",
+    "stop": "supabase stop",
+    "reset": "supabase db reset",
+    "migrate": "supabase db push",
+    "seed": "supabase seed run",
+    "generate-types": "supabase gen types typescript --local > types/database.types.ts",
+    "deploy-functions": "supabase functions deploy",
+    "serve-functions": "supabase functions serve",
+    "test": "deno test --allow-all functions/*/test.ts",
+    "lint": "deno lint functions/",
+    "format": "deno fmt functions/"
+  },
+  "keywords": [
+    "supabase",
+    "edge-functions",
+    "route-generation",
+    "audio-stories",
+    "maps-api",
+    "postgis"
+  ],
+  "author": "RouteStory Team",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "supabase": "^2.34.3"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/routestory/backend.git"
+  },
+  "bugs": {
+    "url": "https://github.com/routestory/backend/issues"
+  },
+  "homepage": "https://github.com/routestory/backend#readme",
+  "dependencies": {
+    "dotenv": "^17.2.1"
+  }
+}
